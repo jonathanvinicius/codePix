@@ -1,7 +1,7 @@
-FROM golang:1.19
+FROM golang:1.21.1
 
 WORKDIR /go/src
-ENV PATH="/go/bin:${PATH}"
+ENV PATH="/go/bin:/go/src/bin:${PATH}" 
 ENV GO111MODULE=on
 ENV CGO_ENABLED=1
 
@@ -12,10 +12,6 @@ RUN apt-get update && \
     go install github.com/spf13/cobra-cli@v1.3.0 && \
     wget https://github.com/ktr0731/evans/releases/download/0.9.1/evans_linux_amd64.tar.gz && \
     tar -xzvf evans_linux_amd64.tar.gz && \
-    mv evans ../bin && rm -f evans_linux_amd64.tar.gz
-
-RUN useradd -u 1000 golang
-
-USER golang
+    mv evans /go/src/bin && rm -f evans_linux_amd64.tar.gz  # Movido para /go/src/bin
 
 CMD ["tail", "-f", "/dev/null"]
