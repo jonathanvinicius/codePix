@@ -12,7 +12,7 @@ type TransactionUseCase struct {
 	PixRepository         model.PixKeyRepositoryInterface
 }
 
-func (t TransactionUseCase) Register(accountId string, amount float64, pixKeyTo string, pixKeyKindTo string, description string) (*model.Transaction, error) {
+func (t *TransactionUseCase) Register(accountId string, amount float64, pixKeyTo string, pixKeyKindTo string, description string, id string) (*model.Transaction, error) {
 	account, err := t.PixRepository.FindAccount(accountId)
 
 	if err != nil {
@@ -29,8 +29,8 @@ func (t TransactionUseCase) Register(accountId string, amount float64, pixKeyTo 
 		return nil, err
 	}
 
-	t.TransactionRepository.Save(*transaction)
-	if transaction.ID != "" {
+	t.TransactionRepository.Save(transaction)
+	if transaction.Base.ID != "" {
 		return transaction, nil
 	}
 
@@ -44,7 +44,7 @@ func (t *TransactionUseCase) Confirm(transactionId string) (*model.Transaction, 
 	}
 
 	transaction.Status = model.TransactionConfirmed
-	err = t.TransactionRepository.Save(*transaction)
+	err = t.TransactionRepository.Save(transaction)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (t *TransactionUseCase) Complete(transactionId string) (*model.Transaction,
 	}
 
 	transaction.Status = model.TransactionCompleted
-	err = t.TransactionRepository.Save(*transaction)
+	err = t.TransactionRepository.Save(transaction)
 	if err != nil {
 		return nil, err
 	}
@@ -75,9 +75,11 @@ func (t *TransactionUseCase) Error(transactionId string, reason string) (*model.
 	transaction.Status = model.TransactionError
 	transaction.CancelDescription = reason
 
-	err = t.TransactionRepository.Save(*transaction)
+	err = t.TransactionRepository.Save(transaction)
 	if err != nil {
 		return nil, err
 	}
+
 	return transaction, nil
+
 }

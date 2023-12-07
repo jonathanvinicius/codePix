@@ -17,7 +17,7 @@ const (
 
 type TransactionRepositoryInterface interface {
 	Register(transaction *Transaction) error
-	Save(transaction Transaction) error
+	Save(transaction *Transaction) error
 	Find(id string) (*Transaction, error)
 }
 
@@ -35,6 +35,10 @@ type Transaction struct {
 	Status            string   `json:"status" gorm:"type:varchar(20)" valid:"notnull"`
 	Description       string   `json:"description" gorm:"type:varchar(255)" valid:"-"`
 	CancelDescription string   `json:"cancel_description" gorm:"type:varchar(255)" valid:"-"`
+}
+
+func init() {
+	govalidator.SetFieldsRequiredByDefault(true)
 }
 
 func (t *Transaction) isValid() error {
